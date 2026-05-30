@@ -1,0 +1,64 @@
+cat << 'EOF' > deployments/coworking.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coworking-analytics
+  labels:
+    app: coworking-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coworking-analytics
+  template:
+    metadata:
+      labels:
+        app: coworking-analytics
+    spec:
+      containers:
+        - name: coworking-analytics
+          image: 216250383354.dkr.ecr.us-east-1.amazonaws.com/coworking-analytics:1.0.0
+          ports:
+            - containerPort: 5153
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health_check
+              port: 5153
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /readiness_check
+              port: 5153
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          envFrom:
+            - configMapRef:
+                name: coworking-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: coworking-secret
+                  key: DB_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coworking-analytics
+spec:
+  type: LoadBalancer
+  selector:
+    app: coworking-analytics
+  ports:
+    - protocol: TCP
+      port: 5153
+      targetPort: 5153
+EOF
