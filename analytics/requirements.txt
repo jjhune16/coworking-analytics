@@ -1,4 +1,5 @@
 apscheduler
-flask==2.2.2
+flask==3.0.3
 psycopg2-binary
 flask_sqlalchemy
+werkzeug==3.0.3

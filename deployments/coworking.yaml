@@ -1,4 +1,3 @@
-cat << 'EOF' > deployments/coworking.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -61,4 +60,3 @@ spec:
     - protocol: TCP
       port: 5153
       targetPort: 5153
-EOF
